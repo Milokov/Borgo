@@ -1,0 +1,7 @@
+{
+  "name": "appNativa",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
