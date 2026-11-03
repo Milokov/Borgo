@@ -1,126 +1,76 @@
-# USCO Móvil
+# 🍔 Borgo - App de Pedidos
 
-**USCO Móvil** es una aplicación de prueba desarrollada con **Ionic + Angular (Standalone)** y empaquetada con **Capacitor** para la plataforma Android. Este proyecto forma parte de las actividades académicas de la **Universidad Surcolombiana**, en la asignatura **Programación de Dispositivos Móviles (Unidad 4)**.
-
----
-
-## Requisitos Previos
-
-Para poder compilar, probar y empaquetar este proyecto, se requiere tener instalado en el equipo:
-- **Node.js** (y npm)
-- **Ionic CLI** (`npm install -g @ionic/cli`)
-- **Android Studio** con el SDK de Android instalado y un emulador configurado (AVD)
-- **JDK** (Java Development Kit, compatible con Gradle)
+**Borgo** es una aplicación móvil moderna desarrollada con **Ionic + Angular (Standalone)** y **Capacitor**, diseñada específicamente para la hamburguesería artesanal **Borgo**. La aplicación ofrece una experiencia de usuario rápida, intuitiva y optimizada para dispositivos móviles (Android), permitiendo a los clientes explorar el menú, armar su pedido y enviarlo directamente a través de **WhatsApp**.
 
 ---
 
-## Estructura del Proyecto
+## 🚀 Funcionalidades Principales
 
-Las carpetas y archivos más importantes del proyecto son:
-- `src/`: Código fuente de la aplicación Angular (páginas, componentes, rutas).
-- `www/`: Archivos web compilados de la aplicación Ionic.
-- `android/`: Proyecto nativo de Android generado por Capacitor.
-- `release/`: Carpeta que contiene el APK compilado (`app-debug.apk`).
-- `capturas/`: Carpeta destinada a almacenar las capturas de pantalla de evidencia (contiene `.gitkeep`).
-- `capacitor.config.ts`: Archivo de configuración global de Capacitor.
+1. **Selección de Tipo de Pedido**:
+   - Inicio interactivo con botones para elegir entre **"A domicilio"** (agrega un costo de envío fijo de `$3.000`) o **"Para llevar"**. El tipo seleccionado se mantiene sincronizado en todo el proceso de compra.
 
----
+2. **Menú Dinámico por Categorías**:
+   - Filtro rápido mediante `ion-segment` con 4 categorías principales:
+     - 🍔 **Hamburguesas** (Clásica, Tocineta, Doble Carne, Champiñones).
+     - 🍟 **Combos** (Clásico, Tocineta, Familiar).
+     - 🧀 **Acompañantes** (Papas francesas, Papas con cheddar y tocineta, Aros de cebolla, Dedos de queso).
+     - 🥤 **Bebidas** (Gaseosa, Té helado, Cerveza, Jugo natural).
+   - Tarjetas (`ion-card`) con emojis descriptivos, nombres, descripciones detalladas, precios en pesos colombianos formateados (ej. `$18.000`) y botón rápido de adición.
 
-## Comandos Utilizados
+3. **Carrito de Compras y Modal Interactivo**:
+   - Botón superior y botón flotante (`ion-fab`) con contador en tiempo real (`ion-badge`).
+   - Modal completo (`ion-modal`) que detalla los productos seleccionados, permitiendo incrementar (`+`), decrementar (`-`) o eliminar artículos.
+   - Cálculo automático de subtotal, costo de envío y total general.
+   - Mensaje amigable cuando el carrito está vacío.
+   - **Persistencia local**: El carrito se guarda automáticamente en `localStorage` para no perder la selección al cerrar la app o recargar.
 
-A continuación se detallan los comandos utilizados en orden cronológico durante el desarrollo:
+4. **Formulario de Checkout y Validación**:
+   - Captura de datos del cliente: Nombre, Teléfono, Tipo de pedido, Dirección de entrega (visible y obligatoria únicamente para pedidos a domicilio), Método de pago (**Efectivo** o **Transferencia Nequi/Daviplata**) y campo de observaciones opcional.
+   - Validación de campos obligatorios con mensajes de alerta claros.
 
-1. `ionic start appNativa blank --type=angular --no-link`
-   - *Crea un nuevo proyecto Ionic con Angular utilizando una plantilla en blanco.*
-2. `cd appNativa`
-   - *Entra en la carpeta del proyecto recién creado.*
-3. Edición de `src/app/home/home.page.html`
-   - *Modifica la vista principal con la interfaz de usuario personalizada.*
-4. `ionic build`
-   - *Compila la aplicación web de Angular generando la carpeta `www`.*
-5. `npm install @capacitor/android`
-   - *Instala la plataforma nativa de Android para Capacitor.*
-6. `npx cap add android`
-   - *Agrega el proyecto nativo Android basado en la configuración de Capacitor.*
-7. `npx cap sync android`
-   - *Sincroniza los cambios web compilados y los plugins con el proyecto Android.*
-8. `npx cap open android`
-   - *Abre el proyecto nativo en Android Studio.*
+5. **Integración con WhatsApp**:
+   - Al confirmar el pedido, la app genera un mensaje formateado y estructurado con todos los datos del cliente, productos, cantidades, subtotales, tipo de servicio y total a pagar.
+   - Utiliza `encodeURIComponent` y abre WhatsApp de manera nativa mediante `window.open(url, '_system')`.
 
 ---
 
-## Configuración de Capacitor
+## 🛠️ Tecnologías Utilizadas
 
-En el archivo [capacitor.config.ts](file:///C:/Users/milox/appNativa/capacitor.config.ts) se estableció la siguiente configuración:
+- **Ionic Framework** (`^9.0.0`)
+- **Angular Standalone Components** (`^22.2.3`)
+- **Capacitor** (`^8.6.0`) para la integración nativa con Android.
+- **TypeScript** y **SASS/CSS** (con diseño Mobile-First y sombras suaves).
 
-```ts
-import type { CapacitorConfig } from '@capacitor/cli';
+---
 
-const config: CapacitorConfig = {
-  appId: 'co.edu.usco.appnativa',
-  appName: 'USCO Móvil',
-  webDir: 'www'
-};
+## ⚙️ Comandos de Desarrollo y Sincronización
 
-export default config;
+Para compilar la aplicación web y sincronizar los cambios con la plataforma nativa de Android, ejecuta en la raíz del proyecto:
+
+```bash
+ionic build
+npx cap sync android
 ```
 
 ---
 
-## Cómo Ejecutar en el Emulador
+## 📱 Cómo Ejecutar y Probar
 
-1. Abre **Android Studio** (o ejecuta `npx cap open android`).
-2. Espera a que finalice el **Gradle Sync** automático.
-3. Selecciona un dispositivo virtual (Emulador AVD) en la barra superior.
-4. Haz clic en el botón **Run** (ícono de Play verde ▶) para compilar y ejecutar la app en el emulador.
-
----
-
-## Cómo Generar el APK
-
-1. En Android Studio, ve al menú superior: **Build > Build Bundle(s) / APK(s) > Build APK(s)**.
-2. Al finalizar, el APK se generará en la ruta:
-   `android/app/build/outputs/apk/debug/app-debug.apk`
-3. Se copió automáticamente una copia a la carpeta `release/` del proyecto para facilitar su entrega.
+1. **Compilar y sincronizar**:
+   ```bash
+   npm run build
+   npx cap sync android
+   ```
+2. **Abrir en Android Studio**:
+   ```bash
+   npx cap open android
+   ```
+3. Selecciona tu emulador o dispositivo físico Android y haz clic en **Run (▶)**.
 
 ---
 
-## Cómo Instalar en un Celular Propios
-
-1. Transfiere el archivo `release/app-debug.apk` a tu dispositivo Android (por cable USB, correo o nube).
-2. En tu celular, abre el archivo APK.
-3. Si el sistema lo solicita, habilita la opción de **Instalar aplicaciones de origen desconocido** (Unknown sources) para este explorador de archivos.
-4. Confirma la instalación y abre la app **USCO Móvil** desde el cajón de aplicaciones.
-
----
-
-## Regla de Oro
-
-> **¡Importante!** Tras cada cambio de código en TypeScript, HTML o CSS, debes repetir los siguientes comandos para que los cambios se reflejen en la app de Android:
-> ```bash
-> ionic build
-> npx cap sync android
-> ```
-
----
-
-## Evidencia
-
-![App ejecutada](capturas/app.png)
-
----
-
-## Problemas Encontrados y Soluciones
-
-1. **Error: "Could not find the android platform"**
-   - *Causa:* No se había instalado la dependencia nativa de Capacitor para Android.
-   - *Solución:* Se ejecutó `npm install @capacitor/android` y posteriormente `npx cap add android`.
-2. **Aviso de incompatibilidad Gradle JVM 25 con Gradle 8.14.3**
-   - *Causa:* La versión del JDK por defecto era la 25, generando conflictos de reflexión interna en AGP.
-   - *Solución:* Se configuró la variable de entorno `JAVA_HOME` apuntando al JDK 21 / JBR adecuado y se resolvieron conflictos de rutas de entorno (`ANDROID_PREFS_ROOT`).
-
----
-
-## Autor
-
-- **Andres Camilo Reina Diaz** 
+## 📂 Archivos Clave Modificados
+- [src/app/home/home.page.html](file:///C:/Users/milox/appNativa/src/app/home/home.page.html): Estructura visual de la tienda, menú, carrito flotante y modal de checkout.
+- [src/app/home/home.page.ts](file:///C:/Users/milox/appNativa/src/app/home/home.page.ts): Lógica de negocio, gestión del carrito, almacenamiento local, filtrado de categorías y generación de URL de WhatsApp.
+- [src/app/home/home.page.scss](file:///C:/Users/milox/appNativa/src/app/home/home.page.scss): Estilos específicos de la página de inicio.
+- [src/global.scss](file:///C:/Users/milox/appNativa/src/global.scss): Estilos globales y paleta de colores de Borgo.
