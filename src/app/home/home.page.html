@@ -1,9 +1,179 @@
 <ion-header>
-  <ion-toolbar style="--background:#8F1414; --color:#FFFFFF">
-    <ion-title>USCO Móvil</ion-title>
+  <!-- Barra superior negra con título "🍔 Borgo" -->
+  <ion-toolbar style="--background: #111111; --color: #FFFFFF;">
+    <ion-title class="ion-text-center font-bold">🍔 Borgo</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="setCartOpen(true)" class="cart-btn">
+        🛒 <ion-badge color="danger" *ngIf="getTotalItems() > 0">{{ getTotalItems() }}</ion-badge>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
-<ion-content class="ion-padding">
-  <h1>¡La app funciona!</h1>
-  <p>Prueba paso a paso con Ionic y Capacitor.</p>
+
+<ion-content class="borgo-content">
+  <!-- Sección de Bienvenida y Selección de Tipo de Pedido -->
+  <div class="welcome-section">
+    <h2>¡Las mejores hamburguesas artesanales! 🔥</h2>
+    <p>Elige cómo deseas disfrutar tu pedido hoy:</p>
+
+    <div class="order-type-buttons">
+      <ion-button
+        [fill]="orderType === 'domicilio' ? 'solid' : 'outline'"
+        color="danger"
+        (click)="setOrderType('domicilio')">
+        🛵 A domicilio
+      </ion-button>
+      <ion-button
+        [fill]="orderType === 'llevar' ? 'solid' : 'outline'"
+        color="danger"
+        (click)="setOrderType('llevar')">
+        🛍️ Para llevar
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Filtro por Categorías con ion-segment -->
+  <ion-segment [(ngModel)]="selectedCategory" mode="md" scrollable="true" color="danger" class="category-segment">
+    <ion-segment-button *ngFor="let cat of categories" [value]="cat">
+      <ion-label>{{ cat }}</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- Listado de Productos -->
+  <div class="products-container">
+    <ion-card *ngFor="let product of filteredProducts" class="product-card">
+      <div class="card-emoji-header">
+        <span class="emoji-icon">{{ product.emoji }}</span>
+        <span class="product-price">{{ formatPrice(product.price) }}</span>
+      </div>
+      <ion-card-header>
+        <ion-card-title>{{ product.name }}</ion-card-title>
+        <ion-card-subtitle>{{ product.category }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <p class="product-desc">{{ product.description }}</p>
+        <ion-button expand="block" color="danger" class="add-btn" (click)="addToCart(product)">
+          Agregar ➕
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Botón flotante para abrir el carrito -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="getTotalItems() > 0">
+    <ion-fab-button color="danger" (click)="setCartOpen(true)">
+      🛒 <ion-badge color="light" class="fab-badge">{{ getTotalItems() }}</ion-badge>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>
+
+<!-- Modal del Carrito y Checkout -->
+<ion-modal [isOpen]="isCartOpen" (didDismiss)="setCartOpen(false)">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar style="--background: #111111; --color: #FFFFFF;">
+        <ion-title>🛒 Tu Carrito - Borgo</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="setCartOpen(false)">Cerrar ❌</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding modal-content">
+      <!-- Si el carrito está vacío -->
+      <div *ngIf="cart.length === 0" class="empty-cart">
+        <span class="empty-emoji">🛒</span>
+        <h3>Tu carrito está vacío</h3>
+        <p>¡Agrega deliciosas hamburguesas y combos para comenzar tu pedido!</p>
+        <ion-button color="danger" expand="block" (click)="setCartOpen(false)">Ver Menú</ion-button>
+      </div>
+
+      <!-- Si el carrito tiene productos -->
+      <div *ngIf="cart.length > 0">
+        <h3 class="section-title">Productos seleccionados</h3>
+        <div class="cart-items-list">
+          <div *ngFor="let item of cart" class="cart-item">
+            <div class="item-info">
+              <span class="item-emoji">{{ item.product.emoji }}</span>
+              <div>
+                <h4>{{ item.product.name }}</h4>
+                <p class="item-price">{{ formatPrice(item.product.price) }} c/u</p>
+              </div>
+            </div>
+            <div class="item-controls">
+              <ion-button size="small" fill="outline" color="danger" (click)="decreaseQty(item)">➖</ion-button>
+              <span class="qty-text">{{ item.quantity }}</span>
+              <ion-button size="small" fill="outline" color="danger" (click)="increaseQty(item)">➕</ion-button>
+              <ion-button size="small" fill="clear" color="dark" (click)="removeFromCart(item)">🗑️</ion-button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Formulario de Pedido -->
+        <div class="checkout-form">
+          <h3 class="section-title">Datos del Pedido</h3>
+
+          <ion-item class="form-item">
+            <ion-input label="Nombre completo *" labelPlacement="stacked" [(ngModel)]="customerName" placeholder="Ej. Carlos Pérez"></ion-input>
+          </ion-item>
+          <ion-text color="danger" *ngIf="formSubmitted && !customerName.trim()" class="error-msg">
+            <small>⚠️ El nombre es obligatorio.</small>
+          </ion-text>
+
+          <ion-item class="form-item">
+            <ion-input label="Teléfono / WhatsApp *" labelPlacement="stacked" type="tel" [(ngModel)]="customerPhone" placeholder="Ej. 3001234567"></ion-input>
+          </ion-item>
+          <ion-text color="danger" *ngIf="formSubmitted && !customerPhone.trim()" class="error-msg">
+            <small>⚠️ El teléfono es obligatorio.</small>
+          </ion-text>
+
+          <ion-item class="form-item">
+            <ion-select label="Tipo de pedido" labelPlacement="stacked" [(ngModel)]="orderType">
+              <ion-select-option value="domicilio">🛵 A domicilio (Envío $3.000)</ion-select-option>
+              <ion-select-option value="llevar">🛍️ Para llevar</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item class="form-item" *ngIf="orderType === 'domicilio'">
+            <ion-input label="Dirección de entrega *" labelPlacement="stacked" [(ngModel)]="customerAddress" placeholder="Ej. Calle 10 # 5-20, Apto 301"></ion-input>
+          </ion-item>
+          <ion-text color="danger" *ngIf="formSubmitted && orderType === 'domicilio' && !customerAddress.trim()" class="error-msg">
+            <small>⚠️ La dirección es obligatoria para domicilios.</small>
+          </ion-text>
+
+          <ion-item class="form-item">
+            <ion-select label="Método de pago" labelPlacement="stacked" [(ngModel)]="paymentMethod">
+              <ion-select-option value="efectivo">💵 Efectivo</ion-select-option>
+              <ion-select-option value="transferencia">📱 Transferencia Nequi / Daviplata</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item class="form-item">
+            <ion-textarea label="Observaciones (Opcional)" labelPlacement="stacked" [(ngModel)]="customerNotes" placeholder="Ej. Sin cebolla, salsas aparte..."></ion-textarea>
+          </ion-item>
+        </div>
+
+        <!-- Resumen de Costos -->
+        <div class="cart-summary">
+          <div class="summary-row">
+            <span>Subtotal:</span>
+            <span>{{ formatPrice(getSubtotal()) }}</span>
+          </div>
+          <div class="summary-row" *ngIf="orderType === 'domicilio'">
+            <span>Envío:</span>
+            <span>{{ formatPrice(3000) }}</span>
+          </div>
+          <div class="summary-row total-row">
+            <span>Total a pagar:</span>
+            <span class="total-price">{{ formatPrice(getTotal()) }}</span>
+          </div>
+        </div>
+
+        <!-- Botón de Confirmación WhatsApp -->
+        <ion-button expand="block" color="success" class="whatsapp-confirm-btn" (click)="confirmOrder()">
+          📲 Enviar pedido por WhatsApp
+        </ion-button>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>

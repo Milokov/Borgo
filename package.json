@@ -19,6 +19,11 @@
     "test:e2e": "playwright test"
   },
   "private": true,
+  "capacitor": {
+    "appId": "co.edu.usco.appnativa",
+    "appName": "Borgo",
+    "webDir": "www"
+  },
   "dependencies": {
     "@angular/common": "22.2.3",
     "@angular/compiler": "22.2.3",

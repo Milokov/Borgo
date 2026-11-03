@@ -1,0 +1,8 @@
+{
+  "appId": "co.edu.usco.appnativa",
+  "appName": "Borgo",
+  "webDir": "www",
+  "android": {
+    "path": "android"
+  }
+}
